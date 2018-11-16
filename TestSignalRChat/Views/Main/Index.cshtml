@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.signalR-2.1.2.min.js"></script>
+
+<h2>Pagina Principal</h2>
+<div class="row">
+    <div class="col-md-12">
+        <button id="btnNewChat" class="btn btn-primary">Nuevo Chat</button>
+    </div>
+    <div style="display:none" id="newchat" class="col-md-12">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" type="text" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">Todos los Chats</div>
+    <div class="col-md-4">Chat</div>
+    <div class="col-md-4">Usuarios</div>
+</div>
+
+
+
+<script>
+
+    $(document).ready(function () {
+        $('#btnNewChat').click(function () {
+            $('#newchat').show();
+        });
+    });
+
+    var SignalrConnection;
+    var ChatProxy;
+
+    function Connect() {
+        ChatServerUrl = "http://localhost:51165/";
+        var ChatUrl = ChatServerUrl + "signalr";
+        //This will hold the connection to the signalr hub   
+        SignalrConnection = $.hubConnection(ChatUrl, {
+            useDefaultPath: false
+        });
+        ChatProxy = SignalrConnection.createHubProxy('NotificationBase');
+        //This will be called by signalr   
+        ChatProxy.on("NotifyUser", function (temperature) {
+            $('span').text(temperature);
+        });
+
+        //connecting the client to the signalr hub   
+        SignalrConnection.start().done(function () {
+            alert("Connected to Signalr Server");
+        })
+        .fail(function () {
+            alert("failed in connecting to the signalr server");
+        })
+
+    }  
+    Connect();
+</script>
